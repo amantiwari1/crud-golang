@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bitly/go-simplejson"
+
 	"github.com/gorilla/mux"
 
 	"strconv"
@@ -13,10 +15,10 @@ import (
 	"github.com/amantiwari1/crud-golang/pkg/utils"
 )
 
-var NewBook models.Book
+var NewBook models.User
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	newBooks := models.GetAllBooks()
+	newBooks := models.GetAllUser()
 	res, _ := json.Marshal(newBooks)
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
@@ -25,12 +27,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	bookId := vars["bookId"]
-	ID, err := strconv.ParseInt(bookId, 0, 0)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
 	if err != nil {
 		fmt.Println("error while parsing")
 	}
-	bookDetails, _ := models.GetBookById(ID)
+	bookDetails, _ := models.GetUserById(ID)
 	res, _ := json.Marshal(bookDetails)
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
@@ -38,9 +40,9 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	CreateBook := &models.Book{}
+	CreateBook := &models.User{}
 	utils.ParseBody(r, CreateBook)
-	b := CreateBook.CreateBook()
+	b := CreateBook.CreateUser()
 	res, _ := json.Marshal(b)
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
@@ -49,37 +51,70 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	bookId := vars["bookId"]
-	ID, err := strconv.ParseInt(bookId, 0, 0)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
+	userExist, _ := models.GetUserById(ID)
+
+	if userExist.ID == 0 {
+		json := simplejson.New()
+		json.Set("message", "user is not exist")
+
+		payload, _ := json.MarshalJSON()
+		w.Header().Set("Content-Type", "pkglication/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write(payload)
+
+		return
+	}
+
 	if err != nil {
 		fmt.Println("error while parsing")
 	}
-	book := models.DeleteBook(ID)
-	res, _ := json.Marshal(book)
+	models.DeleteUser(ID)
+
+	json := simplejson.New()
+	json.Set("message", "user deleted")
+
+	payload, _ := json.MarshalJSON()
 	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	w.WriteHeader(http.StatusNotFound)
+	w.Write(payload)
+
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	var updateBook = &models.Book{}
+
+	var updateBook = &models.User{}
 	utils.ParseBody(r, updateBook)
 	vars := mux.Vars(r)
-	bookId := vars["bookId"]
-	ID, err := strconv.ParseInt(bookId, 0, 0)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
+	userExist, _ := models.GetUserById(ID)
+
+	if userExist.ID == 0 {
+		json := simplejson.New()
+		json.Set("message", "user is not exist")
+
+		payload, _ := json.MarshalJSON()
+		w.Header().Set("Content-Type", "pkglication/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write(payload)
+
+		return
+	}
 	if err != nil {
 		fmt.Println("error while parsing")
 	}
-	bookDetails, db := models.GetBookById(ID)
+	bookDetails, db := models.GetUserById(ID)
 
 	if updateBook.Name != "" {
 		bookDetails.Name = updateBook.Name
 	}
-	if updateBook.Author != "" {
-		bookDetails.Author = updateBook.Author
+	if updateBook.Email != "" {
+		bookDetails.Email = updateBook.Email
 	}
-	if updateBook.Publication != "" {
-		bookDetails.Publication = updateBook.Publication
+	if updateBook.Gender != "" {
+		bookDetails.Gender = updateBook.Gender
 	}
 
 	db.Save(&bookDetails)
