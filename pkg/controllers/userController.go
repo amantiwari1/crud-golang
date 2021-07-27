@@ -20,7 +20,6 @@ var NewBook models.User
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	newBooks := models.GetAllUser()
 	res, _ := json.Marshal(newBooks)
-	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -34,7 +33,7 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 	bookDetails, _ := models.GetUserById(ID)
 	res, _ := json.Marshal(bookDetails)
-	w.Header().Set("Content-Type", "pkglication/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -44,7 +43,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	utils.ParseBody(r, CreateBook)
 	b := CreateBook.CreateUser()
 	res, _ := json.Marshal(b)
-	w.Header().Set("Content-Type", "pkglication/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -60,7 +59,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		json.Set("message", "user is not exist")
 
 		payload, _ := json.MarshalJSON()
-		w.Header().Set("Content-Type", "pkglication/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(payload)
 
@@ -76,8 +75,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	json.Set("message", "user deleted")
 
 	payload, _ := json.MarshalJSON()
-	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusNotFound)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write(payload)
 
 }
@@ -96,7 +95,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		json.Set("message", "user is not exist")
 
 		payload, _ := json.MarshalJSON()
-		w.Header().Set("Content-Type", "pkglication/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(payload)
 
@@ -119,7 +118,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&bookDetails)
 	res, _ := json.Marshal(bookDetails)
-	w.Header().Set("Content-Type", "pkglication/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
