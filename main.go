@@ -35,6 +35,6 @@ func main() {
 	http.Handle("/", route)
 	log.Println("started server Running at http://localhost:8800")
 
-	log.Fatal(http.ListenAndServe("localhost:8800", setHeaders(route)))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), setHeaders(route)))
 
 }
